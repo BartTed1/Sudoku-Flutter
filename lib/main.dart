@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sudoku/components/GameLevelSelectorCard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -62,27 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Card(
-                color: Theme.of(context).colorScheme.tertiaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text("Prosty", style: Theme.of(context).textTheme.headlineMedium),
-                        ],
-                      ),
-                      const Row(
-                        children: [
-                          Icon(Icons.arrow_right, size: 40.0,)
-                        ]
-                      )
-                    ]
-                  )
-                )
-              ),
+              GameLevelSelectorCard(title: "Łatwy", callback: () => debugPrint("callback")),
+              const SizedBox(height: 16),
+              GameLevelSelectorCard(title: "Średni", callback: () => debugPrint("callback")),
+              const SizedBox(height: 16),
+              GameLevelSelectorCard(title: "Trudny", callback: () => debugPrint("callback")),
             ],
           )
         )
