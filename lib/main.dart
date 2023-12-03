@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sudoku/components/GameLevelSelectorCard.dart';
+import 'package:sudoku/views/GameBoardView.dart';
+import 'package:sudoku/enums/sudoku_difficulty.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,7 +39,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
     if (Platform.isAndroid) {
@@ -59,19 +60,26 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: SingleChildScrollView(
-          child: Column(
+          padding: const EdgeInsets.all(12),
+          child: SingleChildScrollView(
+              child: Column(
             children: [
-              GameLevelSelectorCard(title: "Łatwy", callback: () => debugPrint("callback")),
+              GameLevelSelectorCard(
+                  title: "Łatwy",
+                  callback: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => GameBoardView(difficulty: SudokuDifficulty.easy, valueChecking: true)))),
               const SizedBox(height: 16),
-              GameLevelSelectorCard(title: "Średni", callback: () => debugPrint("callback")),
+              GameLevelSelectorCard(
+                  title: "Średni",
+                  callback: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => GameBoardView(difficulty: SudokuDifficulty.medium, valueChecking: true)))),
               const SizedBox(height: 16),
-              GameLevelSelectorCard(title: "Trudny", callback: () => debugPrint("callback")),
-            ],
-          )
-        )
-      ),
+              GameLevelSelectorCard(
+                  title: "Trudny",
+                  callback: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => GameBoardView(difficulty: SudokuDifficulty.hard, valueChecking: true)))),
+    ],
+          ))),
     );
   }
 }
