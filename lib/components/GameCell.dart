@@ -9,6 +9,7 @@ class GameCell extends StatelessWidget {
     required this.selectedX,
     required this.selectedY,
     required this.value,
+    required this.selectedValue,
     required this.callback,
     required this.isMisplaced,
   }) : super(key: key);
@@ -17,6 +18,7 @@ class GameCell extends StatelessWidget {
   final int y;
   final Function callback;
   final int value;
+  final int selectedValue;
   final int selectedX;
   final int selectedY;
   final bool isMisplaced;
@@ -36,18 +38,28 @@ class GameCell extends StatelessWidget {
             width: 0,
           ),
           color: isSelected
-              ? colorScheme.primaryContainer
+              ? isMisplaced
+                  ? colorScheme.error
+                  : colorScheme.tertiary
               : isAxisSelected
                   ? colorScheme.surface
-                  : Color.fromRGBO(255, 255, 255, 1.0)
+                  : selectedValue == value && value != 0
+                      ? colorScheme.secondaryContainer
+                      : Color.fromRGBO(255, 255, 255, 1.0)
         ),
         child: Center(
           child: Text(
             value == 0 ? "" : value.toString(),
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: isMisplaced
-                    ? Color.fromRGBO(255, 0, 0, 1.0)
-                    : colorScheme.onBackground),
+                    ? isSelected
+                        ? colorScheme.onError
+                        : colorScheme.error
+                    : isSelected
+                        ? colorScheme.onPrimary
+                        : selectedValue == value && value != 0
+                            ? colorScheme.primary
+                            : colorScheme.onSurface),
           ),
         ),
       ),

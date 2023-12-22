@@ -22,19 +22,43 @@ class GameBoardView extends StatefulWidget {
       _GameBoardView(difficulty: difficulty, valueChecking: valueChecking);
 }
 
-class _GameBoardView extends State<GameBoardView> {
+class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
+  AppLifecycleState? _lastLifecycleState;
   DateTime startTime = DateTime.now();
+  int minutes = 0;
+  int seconds = 0;
   String playTime = "00:00";
   SudokuDifficulty difficulty;
   bool valueChecking;
   late Sudoku sudoku;
   int selectedX = 0;
   int selectedY = 0;
+  int selectedValue = 0;
   int mistakes = 0;
   List<List<int>> mistakeCoordinates = [];
 
   _GameBoardView({required this.difficulty, required this.valueChecking}) {
     sudoku = Sudoku(id: 1, difficulty: difficulty, checkingValues: true);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      _lastLifecycleState = state;
+    });
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      print("Paused");
+    } else if (state == AppLifecycleState.resumed) {
+      print("Resumed");
+    } else if (state == AppLifecycleState.detached) {
+      print("Detached");
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
   }
 
   String levelName() {
@@ -53,11 +77,23 @@ class _GameBoardView extends State<GameBoardView> {
 
   void _updateTime() {
     Timer.periodic(Duration(seconds: 1), (timer) {
-      Duration diff = DateTime.now().difference(startTime);
+      if (_lastLifecycleState == AppLifecycleState.paused || _lastLifecycleState == AppLifecycleState.inactive) {
+        return;
+      }
+      int tmpMinutes = minutes;
+      int tmpSeconds = seconds;
+      if (tmpSeconds == 59) {
+        tmpMinutes++;
+        tmpSeconds = 0;
+      } else {
+        tmpSeconds++;
+      }
       String twoDigits(int n) => n.toString().padLeft(2, "0");
-      String twoDigitMinutes = twoDigits(diff.inMinutes.remainder(60));
-      String twoDigitSeconds = twoDigits(diff.inSeconds.remainder(60));
+      String twoDigitMinutes = twoDigits(minutes);
+      String twoDigitSeconds = twoDigits(seconds);
       setState(() {
+        minutes = tmpMinutes;
+        seconds = tmpSeconds;
         playTime = "$twoDigitMinutes:$twoDigitSeconds";
       });
     });
@@ -74,6 +110,7 @@ class _GameBoardView extends State<GameBoardView> {
     setState(() {
       selectedX = x;
       selectedY = y;
+      selectedValue = sudoku.playingBoard[x][y];
     });
     print("x: $selectedX, y: $selectedY");
   }
@@ -177,6 +214,7 @@ class _GameBoardView extends State<GameBoardView> {
                                                 selectedX: selectedX,
                                                 selectedY: selectedY,
                                                 value: value[0],
+                                                selectedValue: selectedValue,
                                                 callback: _onCellTap,
                                                 isMisplaced: _isMisplaced(mistakeCoordinates, value[1], value[2]),
                                               )
@@ -255,9 +293,10 @@ class _GameBoardView extends State<GameBoardView> {
   @override
   void initState() {
     super.initState();
-    _updateTime(); // Start the timer when the widget is created
+    WidgetsBinding.instance!.addObserver(this);
     sudoku.fillSectionsDiagonal();
     sudoku.fillRecurrent(0, 3, sudoku.board);
     sudoku.removeDigitsBasedOnDifficulty();
+    _updateTime(); // Start the timer when the widget is created
   }
 }
