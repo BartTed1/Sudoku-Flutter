@@ -125,6 +125,14 @@ class Sudoku {
     }
   }
 
+  bool isSameNumberAsInSolved(int row, int column, int digit) {
+    if (board[row][column] == digit) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   bool checkRow(int row, int digit, List<List<int>> gameBoard) {
     for (int i = 0; i < 9; i++) {
       if (gameBoard[row][i] == digit) {
@@ -158,52 +166,52 @@ class Sudoku {
     return true;
   }
 
-  List<List<int>> getPlayingBoard() {
-    List<List<int>> tmp = [
+  List<List<List<int>>> getPlayingBoard() {
+    List<List<List<int>>> tmp = [
         [
-          playingBoard[0][0], playingBoard[0][1], playingBoard[0][2],
-          playingBoard[1][0], playingBoard[1][1], playingBoard[1][2],
-          playingBoard[2][0], playingBoard[2][1], playingBoard[2][2]
+          [playingBoard[0][0], 0, 0], [playingBoard[0][1], 0, 1], [playingBoard[0][2], 0, 2],
+          [playingBoard[1][0], 1, 0], [playingBoard[1][1], 1, 1], [playingBoard[1][2], 1, 2],
+          [playingBoard[2][0], 2, 0], [playingBoard[2][1], 2, 1], [playingBoard[2][2], 2, 2]
         ],
         [
-          playingBoard[0][3], playingBoard[0][4], playingBoard[0][5],
-          playingBoard[1][3], playingBoard[1][4], playingBoard[1][5],
-          playingBoard[2][3], playingBoard[2][4], playingBoard[2][5]
+          [playingBoard[0][3], 0, 3], [playingBoard[0][4], 0, 4], [playingBoard[0][5], 0, 5],
+          [playingBoard[1][3], 1, 3], [playingBoard[1][4], 1, 4], [playingBoard[1][5], 1, 5],
+          [playingBoard[2][3], 2, 3], [playingBoard[2][4], 2, 4], [playingBoard[2][5], 2, 5]
         ],
         [
-          playingBoard[0][6], playingBoard[0][7], playingBoard[0][8],
-          playingBoard[1][6], playingBoard[1][7], playingBoard[1][8],
-          playingBoard[2][6], playingBoard[2][7], playingBoard[2][8]
+          [playingBoard[0][6], 0, 6], [playingBoard[0][7], 0, 7], [playingBoard[0][8], 0, 8],
+          [playingBoard[1][6], 1, 6], [playingBoard[1][7], 1, 7], [playingBoard[1][8], 1, 8],
+          [playingBoard[2][6], 2, 6], [playingBoard[2][7], 2, 7], [playingBoard[2][8], 2, 8]
         ],
         [
-          playingBoard[3][0], playingBoard[3][1], playingBoard[3][2],
-          playingBoard[4][0], playingBoard[4][1], playingBoard[4][2],
-          playingBoard[5][0], playingBoard[5][1], playingBoard[5][2]
+          [playingBoard[3][0], 3, 0], [playingBoard[3][1], 3, 1], [playingBoard[3][2], 3, 2],
+          [playingBoard[4][0], 4, 0], [playingBoard[4][1], 4, 1], [playingBoard[4][2], 4, 2],
+          [playingBoard[5][0], 5, 0], [playingBoard[5][1], 5, 1], [playingBoard[5][2], 5, 2]
         ],
         [
-          playingBoard[3][3], playingBoard[3][4], playingBoard[3][5],
-          playingBoard[4][3], playingBoard[4][4], playingBoard[4][5],
-          playingBoard[5][3], playingBoard[5][4], playingBoard[5][5]
+          [playingBoard[3][3], 3, 3], [playingBoard[3][4], 3, 4], [playingBoard[3][5], 3, 5],
+          [playingBoard[4][3], 4, 3], [playingBoard[4][4], 4, 4], [playingBoard[4][5], 4, 5],
+          [playingBoard[5][3], 5, 3], [playingBoard[5][4], 5, 4], [playingBoard[5][5], 5, 5]
         ],
         [
-          playingBoard[3][6], playingBoard[3][7], playingBoard[3][8],
-          playingBoard[4][6], playingBoard[4][7], playingBoard[4][8],
-          playingBoard[5][6], playingBoard[5][7], playingBoard[5][8]
+          [playingBoard[3][6], 3, 6], [playingBoard[3][7], 3, 7], [playingBoard[3][8], 3, 8],
+          [playingBoard[4][6], 4, 6], [playingBoard[4][7], 4, 7], [playingBoard[4][8], 4, 8],
+          [playingBoard[5][6], 5, 6], [playingBoard[5][7], 5, 7], [playingBoard[5][8], 5, 8]
         ],
         [
-          playingBoard[6][0], playingBoard[6][1], playingBoard[6][2],
-          playingBoard[7][0], playingBoard[7][1], playingBoard[7][2],
-          playingBoard[8][0], playingBoard[8][1], playingBoard[8][2]
+          [playingBoard[6][0], 6, 0], [playingBoard[6][1], 6, 1], [playingBoard[6][2], 6, 2],
+          [playingBoard[7][0], 7, 0], [playingBoard[7][1], 7, 1], [playingBoard[7][2], 7, 2],
+          [playingBoard[8][0], 8, 0], [playingBoard[8][1], 8, 1], [playingBoard[8][2], 8, 2]
         ],
         [
-          playingBoard[6][3], playingBoard[6][4], playingBoard[6][5],
-          playingBoard[7][3], playingBoard[7][4], playingBoard[7][5],
-          playingBoard[8][3], playingBoard[8][4], playingBoard[8][5]
+          [playingBoard[6][3], 6, 3], [playingBoard[6][4], 6, 4], [playingBoard[6][5], 6, 5],
+          [playingBoard[7][3], 7, 3], [playingBoard[7][4], 7, 4], [playingBoard[7][5], 7, 5],
+          [playingBoard[8][3], 8, 3], [playingBoard[8][4], 8, 4], [playingBoard[8][5], 8, 5]
         ],
         [
-          playingBoard[6][6], playingBoard[6][7], playingBoard[6][8],
-          playingBoard[7][6], playingBoard[7][7], playingBoard[7][8],
-          playingBoard[8][6], playingBoard[8][7], playingBoard[8][8]
+          [playingBoard[6][6], 6, 6], [playingBoard[6][7], 6, 7], [playingBoard[6][8], 6, 8],
+          [playingBoard[7][6], 7, 6], [playingBoard[7][7], 7, 7], [playingBoard[7][8], 7, 8],
+          [playingBoard[8][6], 8, 6], [playingBoard[8][7], 8, 7], [playingBoard[8][8], 8, 8]
         ]
     ];
     return tmp;
