@@ -18,6 +18,7 @@ class Sudoku {
     [0, 0, 0, 0, 0, 0, 0, 0, 0]  // 8
   ];
   List<List<int>> playingBoard = [];
+  List<int> digitUsage = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   Sudoku(
       {required this.id,
@@ -266,5 +267,27 @@ class Sudoku {
       ]
     ];
     return board;
+  }
+
+  void insertDigit(int x, int y, int digit) {
+    playingBoard[x][y] = digit;
+    digitUsage = setDigitUsage();
+  }
+
+  List<int> setDigitUsage() {
+    List<int> tmpDigitUsage = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (playingBoard[i][j] != 0 && playingBoard[i][j] == board[i][j]) {
+          tmpDigitUsage[playingBoard[i][j] - 1]++;
+        }
+      }
+    }
+    digitUsage = tmpDigitUsage;
+    return tmpDigitUsage;
+  }
+
+  List<int> getDigitUsage() {
+    return digitUsage;
   }
 }

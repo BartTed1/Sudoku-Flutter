@@ -36,6 +36,7 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   int selectedValue = 0;
   int mistakes = 0;
   List<List<int>> mistakeCoordinates = [];
+  late List<int> digitUsage;
 
   _GameBoardView({required this.difficulty, required this.valueChecking}) {
     sudoku = Sudoku(id: 1, difficulty: difficulty, checkingValues: true);
@@ -116,6 +117,11 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   }
 
   void _onDigitTap(String value) {
+    // If selectedValue in playingBoard is not 0 and is the same as in solvedBoard then don't allow changes
+    bool isSelectedValueInPlayingBoard = sudoku.playingBoard[selectedX][selectedY] != 0;
+    bool isSelectedValueSameAsInSolved = sudoku.isSameNumberAsInSolved(selectedX, selectedY, selectedValue);
+    if (isSelectedValueInPlayingBoard && isSelectedValueSameAsInSolved) return;
+
     bool isSameNumberAsInSolved = sudoku.isSameNumberAsInSolved(selectedX, selectedY, int.parse(value));
     if (!isSameNumberAsInSolved) setState(() {
       mistakes = mistakes + 1;
@@ -125,17 +131,13 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
       mistakeCoordinates = mistakeCoordinates.where((element) => element[0] != selectedX && element[1] != selectedY).toList();
     });
     setState(() {
-      sudoku.playingBoard[selectedX][selectedY] = int.parse(value);
+      sudoku.insertDigit(selectedX, selectedY, int.parse(value));
+      digitUsage = sudoku.getDigitUsage();
     });
+    _onCellTap(selectedX, selectedY);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (Platform.isAndroid) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          systemNavigationBarColor: Theme.of(context).colorScheme.background,
-          systemNavigationBarIconBrightness: Brightness.light));
-    }
+  Widget PlayingBoard(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
             body: SafeArea(
@@ -154,7 +156,7 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                           .bodySmall),
                                   Text('$playTime',
                                       style:
-                                          Theme.of(context).textTheme.bodyLarge)
+                                      Theme.of(context).textTheme.bodyLarge)
                                 ]),
                                 Column(children: [
                                   Text("Poziom",
@@ -163,7 +165,7 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                           .bodySmall),
                                   Text(levelName(),
                                       style:
-                                          Theme.of(context).textTheme.bodyLarge)
+                                      Theme.of(context).textTheme.bodyLarge)
                                 ]),
                                 Column(children: [
                                   Text("  Błędy  ",
@@ -172,74 +174,74 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                           .bodySmall),
                                   Text(mistakes.toString(),
                                       style:
-                                          Theme.of(context).textTheme.bodyLarge)
+                                      Theme.of(context).textTheme.bodyLarge)
                                 ])
                               ]),
                           const SizedBox(height: 16),
                           Expanded(
                               child: GridView.count(
-                            crossAxisCount: 1,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondaryContainer,
-                                        width: 2)),
-                                child: GridView.count(
-                                  crossAxisCount: 3,
-                                  children:
+                                crossAxisCount: 1,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondaryContainer,
+                                            width: 2)),
+                                    child: GridView.count(
+                                      crossAxisCount: 3,
+                                      children:
                                       sudoku.getPlayingBoard().map((section) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondaryContainer,
-                                              width: 2)),
-                                      child: GridView.count(
-                                        crossAxisCount: 3,
-                                        children: section.map((value) {
-                                          return Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondaryContainer,
-                                                      width: 1)),
-                                              child: GameCell(
-                                                x: value[1],
-                                                y: value[2],
-                                                selectedX: selectedX,
-                                                selectedY: selectedY,
-                                                value: value[0],
-                                                selectedValue: selectedValue,
-                                                callback: _onCellTap,
-                                                isMisplaced: _isMisplaced(mistakeCoordinates, value[1], value[2]),
-                                              )
-                                          );
-                                        }).toList(),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              )
-                            ],
-                          )),
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondaryContainer,
+                                                  width: 2)),
+                                          child: GridView.count(
+                                            crossAxisCount: 3,
+                                            children: section.map((value) {
+                                              return Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .secondaryContainer,
+                                                          width: 1)),
+                                                  child: GameCell(
+                                                    x: value[1],
+                                                    y: value[2],
+                                                    selectedX: selectedX,
+                                                    selectedY: selectedY,
+                                                    value: value[0],
+                                                    selectedValue: selectedValue,
+                                                    callback: _onCellTap,
+                                                    isMisplaced: _isMisplaced(mistakeCoordinates, value[1], value[2]),
+                                                  )
+                                              );
+                                            }).toList(),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  )
+                                ],
+                              )),
                           const SizedBox(height: 16),
                           Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                DigitButton(value: "1", callback: _onDigitTap),
-                                DigitButton(value: "2", callback: _onDigitTap),
-                                DigitButton(value: "3", callback: _onDigitTap),
-                                DigitButton(value: "4", callback: _onDigitTap),
-                                DigitButton(value: "5", callback: _onDigitTap),
-                                DigitButton(value: "6", callback: _onDigitTap),
-                                DigitButton(value: "7", callback: _onDigitTap),
-                                DigitButton(value: "8", callback: _onDigitTap),
-                                DigitButton(value: "9", callback: _onDigitTap),
+                                DigitButton(value: "1", callback: _onDigitTap, usageCount: digitUsage[0]),
+                                DigitButton(value: "2", callback: _onDigitTap, usageCount: digitUsage[1]),
+                                DigitButton(value: "3", callback: _onDigitTap, usageCount: digitUsage[2]),
+                                DigitButton(value: "4", callback: _onDigitTap, usageCount: digitUsage[3]),
+                                DigitButton(value: "5", callback: _onDigitTap, usageCount: digitUsage[4]),
+                                DigitButton(value: "6", callback: _onDigitTap, usageCount: digitUsage[5]),
+                                DigitButton(value: "7", callback: _onDigitTap, usageCount: digitUsage[6]),
+                                DigitButton(value: "8", callback: _onDigitTap, usageCount: digitUsage[7]),
+                                DigitButton(value: "9", callback: _onDigitTap, usageCount: digitUsage[8]),
                               ]),
                           /*const Text("DEBUG Plansza rozwiązana:", style: TextStyle(fontSize: 16)),
                         Expanded(
@@ -290,6 +292,35 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                         ])))));
   }
 
+  Widget paused(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Icon(
+            Icons.pause_circle_filled,
+            size: 100,
+            color: Theme.of(context).colorScheme.primary,
+          )
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (Platform.isAndroid) {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          systemNavigationBarColor: Theme.of(context).colorScheme.background,
+          systemNavigationBarIconBrightness: Brightness.light));
+    }
+    if (_lastLifecycleState == AppLifecycleState.paused || _lastLifecycleState == AppLifecycleState.inactive) {
+      return paused(context);
+    }
+    else {
+      return PlayingBoard(context);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -297,6 +328,8 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
     sudoku.fillSectionsDiagonal();
     sudoku.fillRecurrent(0, 3, sudoku.board);
     sudoku.removeDigitsBasedOnDifficulty();
+    digitUsage = sudoku.setDigitUsage();
+    _onCellTap(0, 0);
     _updateTime(); // Start the timer when the widget is created
   }
 }

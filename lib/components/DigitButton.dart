@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DigitButton extends StatelessWidget {
-  const DigitButton({Key? key, required this.value, required this.callback})
+  const DigitButton({Key? key, required this.value, required this.callback, required this.usageCount})
       : super(key: key);
 
   final String value;
   final Function callback;
+  final int usageCount;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class DigitButton extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            value.toString(),
+            usageCount == 9 ? " " : value.toString(),
             style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),
