@@ -1,1 +1,1 @@
-enum SudokuDifficulty { easy, medium, hard }
+enum SudokuDifficulty { veryEasy, easy, medium, hard }

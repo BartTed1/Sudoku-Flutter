@@ -5,6 +5,7 @@ class Sudoku {
   final int id;
   final SudokuDifficulty difficulty;
   final bool checkingValues;
+  final Function solvedCallback;
 
   List<List<int>> board = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0], // 0
@@ -23,7 +24,8 @@ class Sudoku {
   Sudoku(
       {required this.id,
         required this.difficulty,
-        required this.checkingValues});
+        required this.checkingValues,
+        required this.solvedCallback});
 
   void fillSectionsDiagonal() {
     int j = 0;
@@ -58,6 +60,9 @@ class Sudoku {
   void removeDigitsBasedOnDifficulty() {
     int digitsToRemove = 0;
     switch (difficulty) {
+      case SudokuDifficulty.veryEasy:
+        digitsToRemove = 2;
+        break;
       case SudokuDifficulty.easy:
         digitsToRemove = Random().nextInt(6) + 30;
         break;
@@ -284,6 +289,9 @@ class Sudoku {
       }
     }
     digitUsage = tmpDigitUsage;
+    if (digitUsage.every((element) => element == 9)) {
+      solvedCallback();
+    }
     return tmpDigitUsage;
   }
 

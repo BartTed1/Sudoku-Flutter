@@ -65,6 +65,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
             children: [
               GameLevelSelectorCard(
+                  title: "Bardzo łatwy",
+                  callback: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => GameBoardView(difficulty: SudokuDifficulty.veryEasy, valueChecking: true)))),
+              const SizedBox(height: 16),
+              GameLevelSelectorCard(
                   title: "Łatwy",
                   callback: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => GameBoardView(difficulty: SudokuDifficulty.easy, valueChecking: true)))),

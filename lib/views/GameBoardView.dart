@@ -39,7 +39,7 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   late List<int> digitUsage;
 
   _GameBoardView({required this.difficulty, required this.valueChecking}) {
-    sudoku = Sudoku(id: 1, difficulty: difficulty, checkingValues: true);
+    sudoku = Sudoku(id: 1, difficulty: difficulty, checkingValues: true, solvedCallback: _onSolved);
   }
 
   @override
@@ -64,6 +64,9 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
 
   String levelName() {
     switch (difficulty) {
+      case SudokuDifficulty.veryEasy:
+        return "Bardzo łatwy";
+        break;
       case SudokuDifficulty.easy:
         return "Łatwy";
         break;
@@ -74,6 +77,10 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
         return "Trudny";
         break;
     }
+  }
+
+  void _onSolved() {
+    print("Solved");
   }
 
   void _updateTime() {
