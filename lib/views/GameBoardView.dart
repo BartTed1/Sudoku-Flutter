@@ -80,7 +80,8 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   }
 
   void _onSolved() {
-    print("Solved");
+    // push route without possibility to go back
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => AfterSolveSummary(difficulty: difficulty, playTime: playTime, mistakes: mistakes)), (route) => false);
   }
 
   void _updateTime() {
@@ -145,6 +146,7 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   }
 
   Widget PlayingBoard(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return MaterialApp(
         home: Scaffold(
             body: SafeArea(
@@ -185,57 +187,57 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                 ])
                               ]),
                           const SizedBox(height: 16),
-                          Expanded(
-                              child: GridView.count(
-                                crossAxisCount: 1,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondaryContainer,
-                                            width: 2)),
-                                    child: GridView.count(
-                                      crossAxisCount: 3,
-                                      children:
-                                      sudoku.getPlayingBoard().map((section) {
-                                        return Container(
+                          Container(
+                            width: width,
+                            height: width - 32.0,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer,
+                                    width: 2
+                                )
+                            ),
+                            // child playingBoard
+                            child: GridView.count(
+                              crossAxisCount: 3,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: sudoku.getPlayingBoard().map((section) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondaryContainer,
+                                          width: 2)),
+                                  child: GridView.count(
+                                    crossAxisCount: 3,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    children: section.map((value) {
+                                      return Container(
                                           decoration: BoxDecoration(
                                               border: Border.all(
                                                   color: Theme.of(context)
                                                       .colorScheme
                                                       .secondaryContainer,
-                                                  width: 2)),
-                                          child: GridView.count(
-                                            crossAxisCount: 3,
-                                            children: section.map((value) {
-                                              return Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Theme.of(context)
-                                                              .colorScheme
-                                                              .secondaryContainer,
-                                                          width: 1)),
-                                                  child: GameCell(
-                                                    x: value[1],
-                                                    y: value[2],
-                                                    selectedX: selectedX,
-                                                    selectedY: selectedY,
-                                                    value: value[0],
-                                                    selectedValue: selectedValue,
-                                                    callback: _onCellTap,
-                                                    isMisplaced: _isMisplaced(mistakeCoordinates, value[1], value[2]),
-                                                  )
-                                              );
-                                            }).toList(),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  )
-                                ],
-                              )),
+                                                  width: 1)),
+                                          child: GameCell(
+                                            x: value[1],
+                                            y: value[2],
+                                            selectedX: selectedX,
+                                            selectedY: selectedY,
+                                            value: value[0],
+                                            selectedValue: selectedValue,
+                                            callback: _onCellTap,
+                                            isMisplaced: _isMisplaced(mistakeCoordinates, value[1], value[2]),
+                                          )
+                                      );
+                                    }).toList(),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
                           const SizedBox(height: 16),
                           Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
