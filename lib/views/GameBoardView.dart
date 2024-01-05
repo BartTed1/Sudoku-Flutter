@@ -6,6 +6,8 @@ import 'package:sudoku/enums/sudoku_difficulty.dart';
 import 'package:sudoku/classes/Sudoku.dart';
 import 'package:sudoku/components/GameCell.dart';
 import 'package:sudoku/components/DigitButton.dart';
+import 'package:sudoku/main.dart';
+import 'package:sudoku/views/AfterSolveSummary.dart';
 
 class GameBoardView extends StatefulWidget {
   final SudokuDifficulty difficulty;

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:sudoku/components/GameLevelSelectorCard.dart';
 import 'package:sudoku/views/GameBoardView.dart';
 import 'package:sudoku/enums/sudoku_difficulty.dart';
+import 'package:sudoku/views/LoadingView.dart';
 
 void main() {
   runApp(const MyApp());
@@ -67,22 +68,22 @@ class _MyHomePageState extends State<MyHomePage> {
               GameLevelSelectorCard(
                   title: "Bardzo łatwy",
                   callback: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => GameBoardView(difficulty: SudokuDifficulty.veryEasy, valueChecking: true)))),
+                      builder: (context) => LoadingView(difficulty: SudokuDifficulty.veryEasy, valueChecking: true)))),
               const SizedBox(height: 16),
               GameLevelSelectorCard(
                   title: "Łatwy",
                   callback: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => GameBoardView(difficulty: SudokuDifficulty.easy, valueChecking: true)))),
+                      builder: (context) => LoadingView(difficulty: SudokuDifficulty.easy, valueChecking: true)))),
               const SizedBox(height: 16),
               GameLevelSelectorCard(
                   title: "Średni",
                   callback: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => GameBoardView(difficulty: SudokuDifficulty.medium, valueChecking: true)))),
+                      builder: (context) => LoadingView(difficulty: SudokuDifficulty.medium, valueChecking: true)))),
               const SizedBox(height: 16),
               GameLevelSelectorCard(
                   title: "Trudny",
                   callback: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => GameBoardView(difficulty: SudokuDifficulty.hard, valueChecking: true)))),
+                    builder: (context) => LoadingView(difficulty: SudokuDifficulty.hard, valueChecking: true)))),
     ],
           ))),
     );
