@@ -27,7 +27,8 @@ class GameCell extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isSelected = (x == selectedX && y == selectedY);
     bool isAxisSelected = (x == selectedX || y == selectedY);
-    ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: Colors.deepPurple);
+    bool isSameSquare = (x ~/ 3 == selectedX ~/ 3 && y ~/ 3 == selectedY ~/ 3);
+    ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: Colors.blueGrey);
 
     return GestureDetector(
       onTap: () => callback(x, y),
@@ -40,11 +41,11 @@ class GameCell extends StatelessWidget {
           color: isSelected
               ? isMisplaced
                   ? colorScheme.error
-                  : colorScheme.tertiary
-              : isAxisSelected
-                  ? colorScheme.surface
+                  : Color.fromRGBO(139, 201, 246, 1.0)
+              : isAxisSelected || isSameSquare
+                  ? Color.fromRGBO(139, 201, 246, 0.2)
                   : selectedValue == value && value != 0
-                      ? colorScheme.secondaryContainer
+                      ? Color.fromRGBO(210, 246, 139, 0.3)
                       : Color.fromRGBO(255, 255, 255, 1.0)
         ),
         child: Center(
@@ -56,9 +57,9 @@ class GameCell extends StatelessWidget {
                         ? colorScheme.onError
                         : colorScheme.error
                     : isSelected
-                        ? colorScheme.onPrimary
+                        ? Colors.black
                         : selectedValue == value && value != 0
-                            ? colorScheme.primary
+                            ? Color.fromRGBO(76, 77, 46, 1.0)
                             : colorScheme.onSurface),
           ),
         ),

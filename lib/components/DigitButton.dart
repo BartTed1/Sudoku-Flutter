@@ -13,17 +13,19 @@ class DigitButton extends StatelessWidget {
     return GestureDetector(
       onTap: () => callback(value),
       child: Container(
+        width: 38,
         decoration: BoxDecoration(
           border: Border.all(
             color: Color.fromRGBO(255, 255, 255, 1.0),
             width: 0,
           ),
-          color: Color.fromRGBO(255, 255, 255, 1.0),
         ),
         child: Center(
           child: Text(
             usageCount == 9 ? " " : value.toString(),
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+               color: Color.fromRGBO(0, 0, 0, 1.0),
+            ),
           ),
         ),
       ),

@@ -194,10 +194,8 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                             height: width - 32.0,
                             decoration: BoxDecoration(
                                 border: Border.all(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer,
-                                    width: 2
+                                    color: Color.fromRGBO(0, 0, 0, 1.0),
+                                    width: 1
                                 )
                             ),
                             // child playingBoard
@@ -208,10 +206,8 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                 return Container(
                                   decoration: BoxDecoration(
                                       border: Border.all(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondaryContainer,
-                                          width: 2)),
+                                          color: Color.fromRGBO(0, 0, 0, 1.0),
+                                          width: 1)),
                                   child: GridView.count(
                                     crossAxisCount: 3,
                                     physics: const NeverScrollableScrollPhysics(),
@@ -219,10 +215,9 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                       return Container(
                                           decoration: BoxDecoration(
                                               border: Border.all(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondaryContainer,
-                                                  width: 1)),
+                                                  color: Color.fromRGBO(
+                                                      187, 187, 187, 1.0),
+                                                  width: 0.5)),
                                           child: GameCell(
                                             x: value[1],
                                             y: value[2],
