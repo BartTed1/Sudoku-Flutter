@@ -172,6 +172,14 @@ class Sudoku {
     return true;
   }
 
+  bool removeValueIfNotSameAsInSolved(int x, int y) {
+    if (!isSameNumberAsInSolved(x, y, playingBoard[x][y])) {
+      playingBoard[x][y] = 0;
+      return true;
+    }
+    return false;
+  }
+
   List<List<List<int>>> getPlayingBoard() {
     List<List<List<int>>> tmp = [
         [

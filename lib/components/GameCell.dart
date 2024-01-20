@@ -45,7 +45,7 @@ class GameCell extends StatelessWidget {
               : isAxisSelected || isSameSquare
                   ? Color.fromRGBO(139, 201, 246, 0.2)
                   : selectedValue == value && value != 0
-                      ? Color.fromRGBO(210, 246, 139, 0.3)
+                      ? Color.fromRGBO(210, 246, 139, 0.2)
                       : Color.fromRGBO(255, 255, 255, 1.0)
         ),
         child: Center(

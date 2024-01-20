@@ -8,6 +8,7 @@ import 'package:sudoku/components/GameCell.dart';
 import 'package:sudoku/components/DigitButton.dart';
 import 'package:sudoku/main.dart';
 import 'package:sudoku/views/AfterSolveSummary.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class GameBoardView extends StatefulWidget {
   final SudokuDifficulty difficulty;
@@ -147,6 +148,26 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
     _onCellTap(selectedX, selectedY);
   }
 
+  void _onRemove() {
+    bool isRemoved = false;
+    setState(() {
+      isRemoved = sudoku.removeValueIfNotSameAsInSolved(selectedX, selectedY);
+    });
+    mistakeCoordinates = mistakeCoordinates.where((element) => element[0] != selectedX && element[1] != selectedY).toList();
+    _onCellTap(selectedX, selectedY);
+    if (!isRemoved) {
+      Fluttertoast.showToast(
+          msg: "Nie można usunąć tej wartości",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Theme.of(context).colorScheme.error,
+          textColor: Theme.of(context).colorScheme.onError,
+          fontSize: 16.0
+      );
+    }
+  }
+
   Widget PlayingBoard(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return MaterialApp(
@@ -234,6 +255,37 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                 );
                               }).toList(),
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap: () => _onRemove(),
+                                child: Container(
+                                  width: 80,
+                                  height: 80,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.delete,
+                                        size: 40.0,
+                                        color: Color.fromRGBO(0, 0, 0, 1.0),
+                                      ),
+                                      Text("Usuń",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Color.fromRGBO(
+                                                  0, 0, 0, 1.0
+                                              )
+                                          )
+                                      )
+                                    ],
+                                  ),
+                                )
+                              )
+                            ]
                           ),
                           const SizedBox(height: 16),
                           Row(
