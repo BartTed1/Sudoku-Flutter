@@ -9,6 +9,8 @@ import 'package:sudoku/components/DigitButton.dart';
 import 'package:sudoku/main.dart';
 import 'package:sudoku/views/AfterSolveSummary.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:sudoku/classes/CircleClipper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameBoardView extends StatefulWidget {
   final SudokuDifficulty difficulty;
@@ -167,9 +169,73 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   }
 
   void _onSolved() {
+    // remove solved game from memory
     sudoku.removeSudokuFromMemory();
+
+    // save stats to memory
+
+
     // push route without possibility to go back
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => AfterSolveSummary(difficulty: difficulty, playTime: playTime, mistakes: mistakes, hints: hints)), (route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => AfterSolveSummary(difficulty: difficulty, playTime: playTime, mistakes: mistakes, hints: hints),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return AnimatedBuilder(
+              animation: animation,
+              builder: (context, child) {
+                return ClipOval(
+                  clipper: CircleClipper(animation.value),
+                  child: child,
+                );
+              },
+              child: child,
+            );
+          },
+          transitionDuration: Duration(milliseconds: 200),
+        ),
+            (route) => false
+    );
+  }
+
+  Future<void> _saveStatsToMemory() async {
+    String sudokuDifficulty = difficulty.name;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // get stats from memory
+    String playTime = await _retrieveStatsFromMemory(sudokuDifficulty, "playTime");
+    String mistakes = await _retrieveStatsFromMemory(sudokuDifficulty, "mistakes");
+    String hints = await _retrieveStatsFromMemory(sudokuDifficulty, "hints");
+
+    // calculate average time
+    if (playTime == "") prefs.setString("sudoku$sudokuDifficulty$playTime", playTime);
+    else {
+      int playSeconds = int.parse(playTime.split(":")[0]) * 60 + int.parse(playTime.split(":")[1]);
+      int currentSeconds = minutes * 60 + seconds;
+      int avgSeconds = (playSeconds + currentSeconds) ~/ 2;
+      String avgTime = "${(avgSeconds / 60).floor()}:${avgSeconds % 60}";
+      prefs.setString("sudoku$sudokuDifficulty$playTime", avgTime);
+    }
+
+    // calculate average mistakes
+    if (mistakes == "") prefs.setString("sudoku$sudokuDifficulty$mistakes", mistakes);
+    else {
+      int avgMistakes = (int.parse(mistakes) + int.parse(mistakes)) ~/ 2;
+      prefs.setString("sudoku$sudokuDifficulty$mistakes", avgMistakes.toString());
+    }
+
+    // calculate average hints
+    if (hints == "") prefs.setString("sudoku$sudokuDifficulty$hints", hints);
+    else {
+      int avgHints = (int.parse(hints) + int.parse(hints)) ~/ 2;
+      prefs.setString("sudoku$sudokuDifficulty$hints", avgHints.toString());
+    }
+  }
+
+  Future<String> _retrieveStatsFromMemory(String difficulty, String stat) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? stats = prefs.getString("sudoku$difficulty$stat");
+    if (stats != null) return stats;
+    return "";
   }
 
   void _updateTime() {

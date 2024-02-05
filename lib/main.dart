@@ -121,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       isUnsolvedGame ?
                           Text("Lub wznów grę:", style: Theme.of(context).textTheme.titleLarge)
                           : const SizedBox(),
+                      const SizedBox(height: 16),
                       isUnsolvedGame
                           ? GameLevelSelectorCard(
                               title: "Wznów grę",
