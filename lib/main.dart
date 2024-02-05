@@ -79,9 +79,20 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Center(
-            child: Text(
-              widget.title,
-              style: Theme.of(context).textTheme.titleLarge,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 45.0,
+                  width: 45.0,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  widget.title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ],
             ),
           ),
         ),

@@ -199,36 +199,36 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   }
 
   Future<void> _saveStatsToMemory() async {
-    String sudokuDifficulty = difficulty.name;
+    String sudokuDifficulty = difficulty.toString().split(".")[1];
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // get stats from memory
-    String playTime = await _retrieveStatsFromMemory(sudokuDifficulty, "playTime");
-    String mistakes = await _retrieveStatsFromMemory(sudokuDifficulty, "mistakes");
-    String hints = await _retrieveStatsFromMemory(sudokuDifficulty, "hints");
+    String playTimeStat = await _retrieveStatsFromMemory(sudokuDifficulty, "playTime");
+    String mistakesStat = await _retrieveStatsFromMemory(sudokuDifficulty, "mistakes");
+    String hintsStat = await _retrieveStatsFromMemory(sudokuDifficulty, "hints");
 
     // calculate average time
-    if (playTime == "") prefs.setString("sudoku$sudokuDifficulty$playTime", playTime);
+    if (playTimeStat == "") prefs.setString("sudoku$sudokuDifficulty"+"playTime", playTime.toString());
     else {
-      int playSeconds = int.parse(playTime.split(":")[0]) * 60 + int.parse(playTime.split(":")[1]);
+      int playSeconds = int.parse(playTimeStat.split(":")[0]) * 60 + int.parse(playTimeStat.split(":")[1]);
       int currentSeconds = minutes * 60 + seconds;
       int avgSeconds = (playSeconds + currentSeconds) ~/ 2;
       String avgTime = "${(avgSeconds / 60).floor()}:${avgSeconds % 60}";
-      prefs.setString("sudoku$sudokuDifficulty$playTime", avgTime);
+      prefs.setString("sudoku$sudokuDifficulty"+"playTime", avgTime);
     }
 
     // calculate average mistakes
-    if (mistakes == "") prefs.setString("sudoku$sudokuDifficulty$mistakes", mistakes);
+    if (mistakesStat == "") prefs.setString("sudoku$sudokuDifficulty"+"mistakes", mistakes.toString());
     else {
-      int avgMistakes = (int.parse(mistakes) + int.parse(mistakes)) ~/ 2;
-      prefs.setString("sudoku$sudokuDifficulty$mistakes", avgMistakes.toString());
+      int avgMistakes = (int.parse(mistakesStat) + mistakes) ~/ 2;
+      prefs.setString("sudoku$sudokuDifficulty"+"mistakes", avgMistakes.toString());
     }
 
     // calculate average hints
-    if (hints == "") prefs.setString("sudoku$sudokuDifficulty$hints", hints);
+    if (hintsStat == "") prefs.setString("sudoku$sudokuDifficulty"+"hints", hints.toString());
     else {
-      int avgHints = (int.parse(hints) + int.parse(hints)) ~/ 2;
-      prefs.setString("sudoku$sudokuDifficulty$hints", avgHints.toString());
+      int avgHints = (int.parse(hintsStat) + hints) ~/ 2;
+      prefs.setString("sudoku$sudokuDifficulty"+"hints", avgHints.toString());
     }
   }
 
