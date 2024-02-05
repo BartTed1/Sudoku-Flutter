@@ -6,8 +6,9 @@ class AfterSolveSummary extends StatelessWidget {
   final SudokuDifficulty difficulty;
   final String playTime;
   final int mistakes;
+  final int hints;
 
-  const AfterSolveSummary({Key? key, required this.difficulty, required this.playTime, required this.mistakes}) : super(key: key);
+  const AfterSolveSummary({Key? key, required this.difficulty, required this.playTime, required this.mistakes, required this.hints}) : super(key: key);
 
 
   @override
@@ -24,6 +25,8 @@ class AfterSolveSummary extends StatelessWidget {
             Text("Twój czas: $playTime", style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
             Text("Liczba błędów: $mistakes", style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(height: 16),
+            Text("Liczba wykorzystanych podpowiedzi: $hints", style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => MyHomePage(title: "Sudoku")), (route) => false),

@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:sudoku/enums/sudoku_difficulty.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class Sudoku {
   final int id;
@@ -25,7 +27,21 @@ class Sudoku {
       {required this.id,
         required this.difficulty,
         required this.checkingValues,
-        required this.solvedCallback});
+        required this.solvedCallback,
+        List<List<int>>? board,
+        List<List<int>>? playingBoard,
+        List<int>? digitUsage
+      }) {
+    if (board != null) {
+      this.board = board;
+    }
+    if (playingBoard != null) {
+      this.playingBoard = playingBoard;
+    }
+    if (digitUsage != null) {
+      this.digitUsage = digitUsage;
+    }
+  }
 
   void fillSectionsDiagonal() {
     int j = 0;
@@ -305,5 +321,37 @@ class Sudoku {
 
   List<int> getDigitUsage() {
     return digitUsage;
+  }
+
+  String toStringifiedJson() {
+    return '{"id": $id, "difficulty": "${difficulty}", "checkingValues": $checkingValues, "solvedCallback": null, "board": ${board.toString()}, "playingBoard": ${playingBoard.toString()}, "digitUsage": ${digitUsage.toString()}}'.replaceAll(" ", "");
+  }
+
+  void saveToMemory({required String playTime, required int minutes, required int seconds, required int mistakes, required List<List<int>> mistakeCoordinates, required int hints}) {
+
+    String sudokuJson = '{"id": $id, "difficulty": "${difficulty}", "checkingValues": $checkingValues, "board": ${board.toString()}, "playingBoard": ${playingBoard.toString()}, "digitUsage": ${digitUsage.toString()}, "playTime": "${playTime}", "minutes": ${minutes}, "seconds": ${seconds}, "mistakes": ${mistakes}, "mistakeCoordinates": ${mistakeCoordinates.toString()}, "hints": ${hints} }'.replaceAll(" ", "");
+    print(sudokuJson);
+
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setString("sudoku", sudokuJson);
+    });
+  }
+
+  void removeSudokuFromMemory() {
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.remove("sudoku");
+    });
+  }
+
+  static Sudoku fromSavedGame({required int id, required SudokuDifficulty difficulty, required List<List<int>> board, required List<List<int>> playingBoard, required bool checkingValues, required Function solvedCallback}) {
+    print("id: $id, difficulty: $difficulty, board: $board, playingBoard: $playingBoard, checkingValues: $checkingValues, solvedCallback: $solvedCallback");
+    return Sudoku(
+        id: id,
+        difficulty: difficulty,
+        board: board,
+        playingBoard: playingBoard,
+        checkingValues: checkingValues,
+        solvedCallback: solvedCallback
+    );
   }
 }

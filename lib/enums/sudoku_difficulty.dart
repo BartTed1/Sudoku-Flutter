@@ -30,4 +30,19 @@ extension SudokuDifficultyExtension on SudokuDifficulty {
         return "bardzo łatwe";
     }
   }
+
+  static SudokuDifficulty fromString(String difficulty) {
+    switch (difficulty) {
+      case "veryEasy":
+        return SudokuDifficulty.veryEasy;
+      case "easy":
+        return SudokuDifficulty.easy;
+      case "medium":
+        return SudokuDifficulty.medium;
+      case "hard":
+        return SudokuDifficulty.hard;
+      default:
+        return SudokuDifficulty.veryEasy;
+    }
+  }
 }

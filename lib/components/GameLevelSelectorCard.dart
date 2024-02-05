@@ -4,10 +4,11 @@ import 'package:flutter/services.dart';
 
 class GameLevelSelectorCard extends StatelessWidget {
   const GameLevelSelectorCard(
-      {Key? key, required this.title, required this.callback})
+      {Key? key, required this.title, required this.callback, this.color = const Color.fromRGBO(139, 201, 246, 1.0)})
       : super(key: key);
   final String title;
   final Function callback;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,14 @@ class GameLevelSelectorCard extends StatelessWidget {
     return GestureDetector(
         onTap: () => callback(),
         child: Card(
-            color: Theme.of(context).colorScheme.tertiaryContainer,
+            color: color,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+              side: BorderSide(
+                color: Colors.black,
+                width: 2.0,
+              ),
+            ),
             child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

@@ -6,6 +6,8 @@ import 'package:sudoku/components/GameLevelSelectorCard.dart';
 import 'package:sudoku/views/GameBoardView.dart';
 import 'package:sudoku/enums/sudoku_difficulty.dart';
 import 'package:sudoku/views/LoadingView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -40,8 +42,31 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool isUnsolvedGame = false;
+  late GameBoardView previousGame;
+  String? sudokuJsonVal = "";
+
+  Future<void> checkUnsolvedGames() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? sudokuJson = prefs.getString("sudoku");
+    sudokuJsonVal = sudokuJson;
+    if (sudokuJson != null) {
+      Map<String, dynamic> sudokuMap = jsonDecode(sudokuJson);
+      previousGame = GameBoardView.gameFromJson(sudokuMap);
+      setState(() {
+        isUnsolvedGame = true;
+      });
+      return;
+    }
+    setState(() {
+      isUnsolvedGame = false;
+    });
+    return;
+  }
+
   @override
   Widget build(BuildContext context) {
+    checkUnsolvedGames();
     if (Platform.isAndroid) {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
           systemNavigationBarColor: Theme.of(context).colorScheme.background,
@@ -64,27 +89,47 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
               child: Column(
-            children: [
-              GameLevelSelectorCard(
-                  title: "Bardzo łatwy",
-                  callback: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => LoadingView(difficulty: SudokuDifficulty.veryEasy, valueChecking: true)))),
-              const SizedBox(height: 16),
-              GameLevelSelectorCard(
-                  title: "Łatwy",
-                  callback: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => LoadingView(difficulty: SudokuDifficulty.easy, valueChecking: true)))),
-              const SizedBox(height: 16),
-              GameLevelSelectorCard(
-                  title: "Średni",
-                  callback: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => LoadingView(difficulty: SudokuDifficulty.medium, valueChecking: true)))),
-              const SizedBox(height: 16),
-              GameLevelSelectorCard(
-                  title: "Trudny",
-                  callback: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => LoadingView(difficulty: SudokuDifficulty.hard, valueChecking: true)))),
-    ],
+                  children: [
+                      GameLevelSelectorCard(
+                        title: "Twoje wyniki",
+                        callback: () => {},
+                        color: Color.fromRGBO(255, 255, 255, 1.0),
+                      ),
+                      const SizedBox(height: 32),
+                      Text("Nowa gra:", style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(height: 16),
+                      GameLevelSelectorCard(
+                          title: "Bardzo łatwy",
+                          callback: () => Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => LoadingView(difficulty: SudokuDifficulty.veryEasy, valueChecking: true)))),
+                      const SizedBox(height: 16),
+                      GameLevelSelectorCard(
+                          title: "Łatwy",
+                          callback: () => Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => LoadingView(difficulty: SudokuDifficulty.easy, valueChecking: true)))),
+                      const SizedBox(height: 16),
+                      GameLevelSelectorCard(
+                          title: "Średni",
+                          callback: () => Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => LoadingView(difficulty: SudokuDifficulty.medium, valueChecking: true)))),
+                      const SizedBox(height: 16),
+                      GameLevelSelectorCard(
+                          title: "Trudny",
+                          callback: () => Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => LoadingView(difficulty: SudokuDifficulty.hard, valueChecking: true)))),
+                      const SizedBox(height: 32),
+                      isUnsolvedGame ?
+                          Text("Lub wznów grę:", style: Theme.of(context).textTheme.titleLarge)
+                          : const SizedBox(),
+                      isUnsolvedGame
+                          ? GameLevelSelectorCard(
+                              title: "Wznów grę",
+                              callback: () => Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => previousGame
+                              )),
+                              color: Color.fromRGBO(210, 246, 139, 1.0))
+                          : const SizedBox(),
+            ],
           ))),
     );
   }

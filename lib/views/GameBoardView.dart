@@ -13,36 +13,120 @@ import 'package:fluttertoast/fluttertoast.dart';
 class GameBoardView extends StatefulWidget {
   final SudokuDifficulty difficulty;
   final bool valueChecking;
+  final List<List<int>>? board;
+  final List<List<int>>? playingBoard;
+  final int mistakes;
+  final List<List<int>> mistakeCoordinates;
+  final int hints;
+  final String playTime;
+  final int minutes;
+  final int seconds;
 
   GameBoardView({
     Key? key,
     required this.difficulty,
     required this.valueChecking,
+    this.board,
+    this.playingBoard,
+    this.mistakes = 0,
+    this.mistakeCoordinates = const [],
+    this.hints = 0,
+    this.playTime = "00:00",
+    this.minutes = 0,
+    this.seconds = 0
   }) : super(key: key);
+
+  static GameBoardView gameFromJson(Map<String, dynamic> json) {
+    return GameBoardView(
+        difficulty: SudokuDifficultyExtension.fromString(json['difficulty'].split('.').last),
+        valueChecking: json['checkingValues'],
+        board: convertDynamicListToListOfLists(json['board']),
+        playingBoard: convertDynamicListToListOfLists(json['playingBoard']),
+        mistakes: json['mistakes'],
+        mistakeCoordinates: convertDynamicListToListOfLists(json['mistakeCoordinates']),
+        hints: json['hints'],
+        playTime: json['playTime'],
+        minutes: json['minutes'],
+        seconds: json['seconds']
+    );
+  }
+
+  static List<List<int>> convertDynamicListToListOfLists(List<dynamic> dynamicList) {
+    return dynamicList.map<List<int>>((dynamic sublist) {
+      if (sublist is List) {
+        // Cast each element in the sublist to int
+        return sublist.cast<int>().toList();
+      } else {
+        // Handle cases where sublist is not a List
+        throw ArgumentError('Invalid sublist type: ${sublist.runtimeType}');
+      }
+    }).toList();
+  }
 
   @override
   State<GameBoardView> createState() =>
-      _GameBoardView(difficulty: difficulty, valueChecking: valueChecking);
+      _GameBoardView(
+          difficulty: difficulty,
+          valueChecking: valueChecking,
+          board: board,
+          playingBoard: playingBoard,
+          mistakes: mistakes,
+          mistakeCoordinates: mistakeCoordinates,
+          hints: hints,
+          playTime: playTime,
+          minutes: minutes,
+          seconds: seconds
+      );
 }
 
 class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   AppLifecycleState? _lastLifecycleState;
   DateTime startTime = DateTime.now();
-  int minutes = 0;
-  int seconds = 0;
-  String playTime = "00:00";
+  int minutes;
+  int seconds;
+  String playTime;
   SudokuDifficulty difficulty;
   bool valueChecking;
   late Sudoku sudoku;
   int selectedX = 0;
   int selectedY = 0;
   int selectedValue = 0;
-  int mistakes = 0;
-  List<List<int>> mistakeCoordinates = [];
+  int mistakes;
+  int hints;
+  List<List<int>> mistakeCoordinates;
   late List<int> digitUsage;
 
-  _GameBoardView({required this.difficulty, required this.valueChecking}) {
-    sudoku = Sudoku(id: 1, difficulty: difficulty, checkingValues: true, solvedCallback: _onSolved);
+  _GameBoardView({
+    required this.difficulty,
+    required this.valueChecking,
+    required List<List<int>>? board,
+    required List<List<int>>? playingBoard,
+    required this.mistakes,
+    required this.mistakeCoordinates,
+    required this.hints,
+    required this.playTime,
+    required this.minutes,
+    required this.seconds
+  }) {
+    if (board != null && playingBoard != null) {
+      sudoku = Sudoku.fromSavedGame(
+          id: 1,
+          difficulty: difficulty,
+          board: board,
+          playingBoard: playingBoard,
+          checkingValues: valueChecking,
+          solvedCallback: _onSolved
+      );
+      print(sudoku);
+    } else {
+      sudoku = Sudoku(id: 1,
+          difficulty: difficulty,
+          checkingValues: true,
+          solvedCallback: _onSolved);
+      sudoku.fillSectionsDiagonal();
+      sudoku.fillRecurrent(0, 3, sudoku.board);
+      sudoku.removeDigitsBasedOnDifficulty();
+    }
   }
 
   @override
@@ -83,8 +167,9 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   }
 
   void _onSolved() {
+    sudoku.removeSudokuFromMemory();
     // push route without possibility to go back
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => AfterSolveSummary(difficulty: difficulty, playTime: playTime, mistakes: mistakes)), (route) => false);
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => AfterSolveSummary(difficulty: difficulty, playTime: playTime, mistakes: mistakes, hints: hints)), (route) => false);
   }
 
   void _updateTime() {
@@ -124,7 +209,6 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
       selectedY = y;
       selectedValue = sudoku.playingBoard[x][y];
     });
-    print("x: $selectedX, y: $selectedY");
   }
 
   void _onDigitTap(String value) {
@@ -146,6 +230,7 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
       digitUsage = sudoku.getDigitUsage();
     });
     _onCellTap(selectedX, selectedY);
+    sudoku.saveToMemory(playTime: playTime, minutes: minutes, seconds: seconds, mistakes: mistakes, mistakeCoordinates: mistakeCoordinates, hints: hints);
   }
 
   void _onRemove() {
@@ -157,15 +242,28 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
     _onCellTap(selectedX, selectedY);
     if (!isRemoved) {
       Fluttertoast.showToast(
-          msg: "Nie można usunąć tej wartości",
+          msg: "Nie można usunąć poprawnej wartości",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
+          timeInSecForIosWeb: 2,
           backgroundColor: Theme.of(context).colorScheme.error,
           textColor: Theme.of(context).colorScheme.onError,
           fontSize: 16.0
       );
     }
+    sudoku.saveToMemory(playTime: playTime, minutes: minutes, seconds: seconds, mistakes: mistakes, mistakeCoordinates: mistakeCoordinates, hints: hints);
+  }
+
+  void _onHint() {
+    if (sudoku.playingBoard[selectedX][selectedY] == sudoku.board[selectedX][selectedY]) return; // jezeli dobrze rozwiązane to nie dawaj podpowiedzi
+    setState(() {
+      sudoku.insertDigit(selectedX, selectedY, sudoku.board[selectedX][selectedY]);
+      digitUsage = sudoku.getDigitUsage();
+    });
+    hints = hints + 1;
+    mistakeCoordinates = mistakeCoordinates.where((element) => element[0] != selectedX && element[1] != selectedY).toList();
+    _onCellTap(selectedX, selectedY);
+    sudoku.saveToMemory(playTime: playTime, minutes: minutes, seconds: seconds, mistakes: mistakes, mistakeCoordinates: mistakeCoordinates, hints: hints);
   }
 
   Widget PlayingBoard(BuildContext context) {
@@ -207,7 +305,16 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                   Text(mistakes.toString(),
                                       style:
                                       Theme.of(context).textTheme.bodyLarge)
-                                ])
+                                ]),
+                                Column(children: [
+                                  Text("  Podpowiedzi  ",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall),
+                                  Text(hints.toString(),
+                                      style:
+                                      Theme.of(context).textTheme.bodyLarge)
+                                ]),
                               ]),
                           const SizedBox(height: 16),
                           Container(
@@ -256,20 +363,20 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                               }).toList(),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 32),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               GestureDetector(
                                 onTap: () => _onRemove(),
                                 child: Container(
-                                  width: 80,
-                                  height: 80,
+                                  width: 90,
+                                  height: 90,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.delete,
+                                        Icons.delete_outline,
                                         size: 40.0,
                                         color: Color.fromRGBO(0, 0, 0, 1.0),
                                       ),
@@ -284,10 +391,35 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
                                     ],
                                   ),
                                 )
-                              )
+                              ),
+                              GestureDetector(
+                                  onTap: () => _onHint(),
+                                  child: Container(
+                                    width: 90,
+                                    height: 90,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.lightbulb_outline,
+                                          size: 40.0,
+                                          color: Color.fromRGBO(0, 0, 0, 1.0),
+                                        ),
+                                        Text("Podpowiedź",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Color.fromRGBO(
+                                                    0, 0, 0, 1.0
+                                                )
+                                            )
+                                        )
+                                      ],
+                                    ),
+                                  )
+                              ),
                             ]
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 64),
                           Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -357,7 +489,7 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
           child: Icon(
             Icons.pause_circle_filled,
             size: 100,
-            color: Theme.of(context).colorScheme.primary,
+            color: Color.fromRGBO(139, 201, 246, 1.0),
           )
         ),
       ),
@@ -383,9 +515,6 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
-    sudoku.fillSectionsDiagonal();
-    sudoku.fillRecurrent(0, 3, sudoku.board);
-    sudoku.removeDigitsBasedOnDifficulty();
     digitUsage = sudoku.setDigitUsage();
     _onCellTap(0, 0);
     _updateTime(); // Start the timer when the widget is created
