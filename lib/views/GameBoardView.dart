@@ -168,12 +168,13 @@ class _GameBoardView extends State<GameBoardView> with WidgetsBindingObserver {
     }
   }
 
-  void _onSolved() {
+  Future<void> _onSolved() async {
     // remove solved game from memory
-    sudoku.removeSudokuFromMemory();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("sudoku");
 
     // save stats to memory
-
+    await _saveStatsToMemory();
 
     // push route without possibility to go back
     Navigator.of(context).pushAndRemoveUntil(

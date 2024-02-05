@@ -8,6 +8,7 @@ import 'package:sudoku/enums/sudoku_difficulty.dart';
 import 'package:sudoku/views/LoadingView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:sudoku/views/StatsView.dart';
 
 void main() {
   runApp(const MyApp());
@@ -92,7 +93,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                       GameLevelSelectorCard(
                         title: "Twoje wyniki",
-                        callback: () => {},
+                        callback: () => Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => StatsView())),
                         color: Color.fromRGBO(255, 255, 255, 1.0),
                       ),
                       const SizedBox(height: 32),
@@ -122,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Text("Lub wznów grę:", style: Theme.of(context).textTheme.titleLarge)
                           : const SizedBox(),
                       const SizedBox(height: 16),
+                      Text(sudokuJsonVal ?? "", style: Theme.of(context).textTheme.labelSmall),
                       isUnsolvedGame
                           ? GameLevelSelectorCard(
                               title: "Wznów grę",

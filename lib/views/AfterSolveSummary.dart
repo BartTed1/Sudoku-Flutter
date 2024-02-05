@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sudoku/enums/sudoku_difficulty.dart';
 import 'package:sudoku/main.dart';
 import 'package:sudoku/components/GameLevelSelectorCard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AfterSolveSummary extends StatelessWidget {
   final SudokuDifficulty difficulty;
@@ -14,6 +15,9 @@ class AfterSolveSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.remove("sudoku");
+    });
     return Scaffold(
       backgroundColor: Color.fromRGBO(139, 201, 246, 1.0),
       body: Padding(
